@@ -6,6 +6,7 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\BookResource;
 use App\Http\Traits\ApiResponse;
+use App\Http\Traits\ApiResponseTrait;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,7 @@ use PhpParser\Node\Stmt\TryCatch;
 
 class BookController extends Controller
 {
+    use ApiResponseTrait;
 
     /**
      * Display a listing of the resource.
@@ -22,11 +24,7 @@ class BookController extends Controller
     {
         // Get all books info.
         $books = Book::all();
-
-        return response()->json([
-            'status' => 'success',
-            'book' => $books
-        ]);
+        return $this->customeRespone(BookResource::collection($books), 'ok', 200);
     }
 
     /**
@@ -43,17 +41,14 @@ class BookController extends Controller
                 'publication_year' => $request->publication_year
             ]);
             DB::commit();
-            return response()->json([
-                'status' => 'success',
-                'book' => $book
-            ]);
+            return $this->customeRespone(new BookResource($book), 'the book created successfully', 201);
+            ;
         } catch (\Throwable $th) {
             DB::rollBack();
 
             Log::error($th);
-            return response()->json([
-                'status' => 'error',
-            ]);
+            return $this->customeRespone(null, 'the book not added', 400);
+
         }
     }
 
@@ -62,11 +57,13 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        return response()->json([
-            'status' => 'success',
-            'book' => $book
-        ]);
-    }
+        try {
+            return $this->customeRespone(new BookResource($book), 'ok', 200);
+
+        } catch (\Throwable $th) {
+            return $this->customeRespone(null , 'the book not found', 404);
+        }
+      }
 
     /**
      * Update the specified resource in storage.
@@ -82,27 +79,23 @@ class BookController extends Controller
                 'publication_year' => $request->publication_year
             ]);
             DB::commit();
-            return response()->json([
-                'status' => 'success',
-                'book' => $book
-            ]);
+            return $this->customeRespone(new BookResource($book), 'the book updated', 200);;
         } catch (\Throwable $th) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-            ]);
-        }
+            return $this->customeRespone(null, 'the book not found', 404);
     }
+}
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Book $book)
     {
-        $book->delete();
-        return response()->json([
-            'status' => 'success',
-        ]);
+        try {
+            $book->delete();
+            return $this->customeRespone('', 'book deleted successfully', 200);
+        } catch (\Throwable $th) {
+            return $this->customeRespone(null, 'this book not found', 404);
+        }
 
     }
 }
