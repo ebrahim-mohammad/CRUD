@@ -5,13 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\BookResource;
-use App\Http\Traits\ApiResponse;
 use App\Http\Traits\ApiResponseTrait;
 use App\Models\Book;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Stmt\TryCatch;
 
 class BookController extends Controller
 {
