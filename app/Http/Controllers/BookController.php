@@ -76,7 +76,7 @@ class BookController extends Controller
                 'publication_year' => $request->publication_year
             ]);
             DB::commit();
-            return $this->customeRespone(new BookResource($book), 'the book updated', 200);;
+            return $this->customeRespone(new BookResource($book), 'the book updated', 200);
         } catch (\Throwable $th) {
             return $this->customeRespone(null, 'the book not found', 404);
     }
